@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird</title>
+    <style>
+        #gamezone{
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gamezone" width="900" height="500"></canvas>
+    <p id="score">Score: 0</p>
+</body>
+<script>
+//khởi tạo biến
+var canvas = document.getElementById("gamezone");//lấy element canvas
+var context = canvas.getContext('2d');
+var scoreElement = document.getElementById('score');//lấy element score
+
+//khởi tạo hình
+var birdimg = new Image();
+var hinhnenchinh = new Image();
+var ongtren = new Image();
+var ongduoi = new Image();
+
+//nạp hình
+birdimg.src = "./img/bird.png";
+hinhnenchinh.src = "./img/nenchinh.png";
+ongtren.src = "./img/ongtren.png";
+ongduoi.src = "./img/ongduoi.png";
+
+//nạp biến
+var score = 0;
+var khoancachhaiong = 150;
+var temp;// từ tọa độ đầu ống trên đến tọa độ đầu ống dưới
+var bird = {
+    x: hinhnenchinh.width/5,
+    y: hinhnenchinh.height/2-200
+}
+var ongs = [];//mảng ống
+ongs[0] = {
+    x:canvas.width,//ống đầu tiên xuất hiện trên cùng, cuối màn hình
+    y:0
+}
+
+//run
+function run(){
+    context.drawImage(hinhnenchinh, 0, 0);
+    context.drawImage(birdimg, bird.x, bird.y)
+    bird.y += 3;
+
+    for(var i=0; i<ongs.length; i++){
+        context.drawImage(ongtren, ongs[i].x, ongs[i].y);
+        temp = ongs[i].y + ongtren.height + khoancachhaiong;//Lấy toạ độ đầu mút đít ống trên + chiều cao của ống trên rồi + khoản cách 2 ống mong muốn sẽ ra toạ độ y cần vẻ đầu mút ống dưới
+        context.drawImage(ongduoi, ongs[i].x, temp);
+        ongs[i].x -= 3;
+        if(ongs[i].x == canvas.width/2){
+            ongs.push({
+                x:canvas.width,//tọa x xuất hiện cuối canvas
+                y:Math.floor( Math.random()*ongtren.height ) - ongtren.height//tọa y ngẫu nhiên từ [0 - max height ongtren]
+            })
+        }
+        if(ongs.length > 3){
+            ongs.splice(0,1);
+        }
+        if(bird.x == ongs[i].x){
+            score++;
+            scoreElement.innerHTML = "Score: " + score;
+        }
+        if(bird.y+birdimg.height >= canvas.height){//nếu toạ độ đít chim chạm đáy canvas, dừng
+            return ;
+        }
+        if(bird.x+birdimg.width >= ongs[i].x && bird.y <= ongs[i].y+ongtren.height)//Nếu tạo độ đầu chim đụng x đầu ống &&
+        // && bird.x <= ongs[i].x+ongtren.width
+            return ;
+
+        // if(bird.y >= 300){
+        //     bird.y -= 120;
+        // }
+    }
+    
+    requestAnimationFrame(run);
+}
+document.addEventListener("keyup", function(){
+    bird.y -= 60;
+});
+run();
+</script>
+</html>
